@@ -1,0 +1,23 @@
+.container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.text {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.animate {
+  animation: scroll var(--rmc-duration) linear infinite;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}

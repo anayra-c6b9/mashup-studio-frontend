@@ -6,7 +6,7 @@ interface HomeProps {}
 
 const Home: FC<HomeProps> = () => {
   return (
-    <div className="pt-8 flex flex-col items-center justify-center gap-20">
+    <div className="pt-8 px-12 flex flex-col items-center justify-center gap-20">
       <SiteBanner />
       <CatCardContainer></CatCardContainer>
     </div>

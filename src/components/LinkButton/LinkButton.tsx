@@ -27,15 +27,6 @@ const LinkButton: FC<LinkButtonProps> = ({
   >
     {label}
   </NavLink>
-  // <a
-  //   href={href}
-  //   id={id}
-  //   className={`${classes}`}
-  //   onMouseEnter={onMouseEnter}
-  //   onClick={onClick}
-  // >
-  //   {label}
-  // </a>
 );
 
 export default LinkButton;
