@@ -32,31 +32,58 @@ const Room: FC = () => {
   const isPlaying = useSelector(
     (state: RootState) => state.musicStream.isPlaying,
   );
+
   const currentPlayList = useSelector(
     (state: RootState) => state.musicQueue.musicQueue,
   );
+  const currentPlayListRef = useRef<string[]>([]);
+  currentPlayListRef.current = currentPlayList;
+
   const nextTrackId = useSelector(
     (state: RootState) => state.musicStream.nextTrackId,
   );
   const prevTrackId = useSelector(
     (state: RootState) => state.musicStream.prevTrackId,
   );
+  const nextTrackIdRef = useRef<string | null>(null);
+  nextTrackIdRef.current = nextTrackId;
+  const prevTrackIdRef = useRef<string | null>(null);
+  prevTrackIdRef.current = prevTrackId;
 
   // function to set current, next and prev tracks
   const setPlayList = (track: string) => {
+    // if (op == 1) {
+    //   console.log("Operation playnext: ", track);
+    //   playMusic(track);
+    // }
+    // if (op == 2) {
+    //   console.log("Operation play prev: ", track);
+    //   playMusic(track);
+    // }
+
     console.log("setting up playlist for: ", track);
+    const list = currentPlayListRef.current;
+
     const currentTrack = track;
-    const currentTrackIndex = currentPlayList.indexOf(currentTrack);
+    const currentTrackIndex = list.indexOf(currentTrack);
     const prevId = Math.max(0, currentTrackIndex - 1);
-    const nextId = Math.min(currentPlayList.length - 1, currentTrackIndex + 1);
+    const nextId = Math.min(list.length - 1, currentTrackIndex + 1);
 
     console.log(currentTrackIndex, prevId, nextId);
+    console.log(
+      `currentTrack: ${list[currentTrackIndex]}, prev: ${list[prevId]}, next: ${list[nextId]}`,
+    );
     dispatch(playTrack(currentTrack));
-    dispatch(setNextTrack(currentPlayList[nextId]));
-    dispatch(setPrevTrack(currentPlayList[prevId]));
-
-    // add the song to the source and play from there
+    dispatch(setNextTrack(list[nextId]));
+    dispatch(setPrevTrack(list[prevId]));
   };
+
+  useEffect(() => {
+    console.log("```````` TrackID was changed");
+    console.log("current: ", currentTrackId);
+    console.log("next: ", nextTrackId);
+    console.log("prev: ", prevTrackId);
+  }, [currentTrackId]);
 
   useEffect(() => {
     if (!roomCode) return;
@@ -89,9 +116,13 @@ const Room: FC = () => {
             console.log(message.payload.queue);
             break;
           case "queue_add":
+            // console.log("Queue add called");
+            // console.log("payload: ", message.payload);
             dispatch(appendMusicQueue(message.payload.trackId));
-            console.log("added a new song to queue");
-            console.log(message.payload.trackId);
+            // console.log("added a new song to queue");
+            // console.log(message.payload.trackId);
+            // console.log("updated song queue");
+            // console.log(currentPlayListRef.current);
             break;
           case "queue_remove":
             dispatch(removeMusicQueue(message.payload.trackId));
@@ -104,8 +135,10 @@ const Room: FC = () => {
             console.log(message.payload.trackId);
             break;
           case "play":
-            console.log("Playing track: ", message.payload);
-            if (!currentPlayList.includes(message.payload.currentTrack)) break;
+            // if (
+            //   !currentPlayListRef.current.includes(message.payload.currentTrack)
+            // )
+            //   break;
             // get current song, next song to be played, previous song
             setPlayList(message.payload.currentTrack);
             break;
@@ -113,14 +146,22 @@ const Room: FC = () => {
             dispatch(pauseTrack());
             break;
           case "next":
-            if (!nextTrackId) break;
-            setPlayList(nextTrackId);
+            if (!nextTrackIdRef.current) break;
+            console.log("> checking next track ID: ", nextTrackIdRef.current);
+            setPlayList(nextTrackIdRef.current);
             break;
           case "prev":
-            if (!prevTrackId) break;
-            setPlayList(prevTrackId);
+            if (!prevTrackIdRef.current) break;
+            console.log(
+              "> checking previous Track ID: ",
+              prevTrackIdRef.current,
+            );
+            setPlayList(prevTrackIdRef.current);
             break;
-
+          case "playback":
+            break;
+          case "joined":
+            break;
           default:
             console.warn("Unknown WS message:", message);
         }
@@ -144,6 +185,29 @@ const Room: FC = () => {
       wsRef.current = null;
     };
   }, [roomCode, dispatch]);
+
+  const playMusic = (trackId: string) => {
+    const ws = wsRef.current;
+    if (!ws) {
+      console.warn("WS not connected");
+      return;
+    }
+
+    if (ws.readyState !== WebSocket.OPEN) {
+      console.warn("WS not open. state:", ws.readyState);
+      return;
+    }
+
+    console.log("sending ws signal to play: ", trackId);
+    ws.send(
+      JSON.stringify({
+        type: "play",
+        payload: {
+          trackId: trackId,
+        },
+      }),
+    );
+  };
 
   return (
     <div className="relative font-jack flex flex-col justify-between h-screen">

@@ -41,6 +41,7 @@ const RoomMusicControls: FC<RoomMusicControlsProps> = ({ wsRef }) => {
 
   // resolve track name and url
   useEffect(() => {
+    console.log("roomMusicControls => current track : ", currentTrack);
     if (!currentTrack) return;
 
     const track = allTracks.find((t) => t.id === currentTrack);
@@ -176,8 +177,6 @@ const RoomMusicControls: FC<RoomMusicControlsProps> = ({ wsRef }) => {
     audio.currentTime = (pct / 100) * duration;
   };
 
-  if (!currentTrack) return <div className="shrink-0 w-0 h-0"></div>;
-
   return (
     <div className="shrink-0">
       <div className="relative pt-3">
@@ -215,7 +214,7 @@ const RoomMusicControls: FC<RoomMusicControlsProps> = ({ wsRef }) => {
                 <button
                   className="w-8 h-8 border border-black border-2 rounded-full flex items-center justify-center"
                   onClick={() => {
-                    playMusic(currentTrack);
+                    playMusic(currentTrack || "");
                   }}
                 >
                   <img src={PlayIcon} alt="Play Icon" className="w-4 h-4" />

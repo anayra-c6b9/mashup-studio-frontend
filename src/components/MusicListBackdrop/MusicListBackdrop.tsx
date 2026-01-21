@@ -29,7 +29,6 @@ const MusicListBackdrop: FC<MusicListBackdropProps> = ({ wsRef }) => {
   const sendQueueAdd = (trackId: string) => {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
     const trackExists = allTracks.some((track) => track === trackId);
     if (trackExists) {
       console.warn("Track already exists:", trackId);
