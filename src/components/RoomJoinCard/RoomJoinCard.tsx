@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import styles from "./RoomJoinCard.module.css";
-import { Form } from "react-router";
+import { Form, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { closeMyComponent } from "../../store/uiSlice";
@@ -10,6 +10,8 @@ interface RoomJoinCardProps {}
 const RoomJoinCard: FC<RoomJoinCardProps> = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [roomCode, setRoomCode] = useState<string>("");
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const isOpen = useSelector((state: RootState) => state.ui.isMyComponentOpen);
@@ -28,6 +30,7 @@ const RoomJoinCard: FC<RoomJoinCardProps> = () => {
     setIsDisabled(false);
     dispatch(closeMyComponent());
     // logic to navigate to room
+    navigate(`/room/${roomCode}`);
   };
 
   const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
