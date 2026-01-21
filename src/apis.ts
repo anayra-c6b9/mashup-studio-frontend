@@ -1,6 +1,6 @@
 import { Track } from "./interface/allTypes";
 
-const API_BASE = "http://localhost:5500";
+const API_BASE = "";
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {

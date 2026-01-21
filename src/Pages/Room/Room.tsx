@@ -96,9 +96,13 @@ const Room: FC = () => {
       wsRef.current = null;
     }
 
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(
-      `ws://localhost:5500/ws/room?code=${encodeURIComponent(roomCode)}`,
+      `${wsProtocol}://${window.location.host}/ws/room?code=${encodeURIComponent(roomCode)}`,
     );
+    // const ws = new WebSocket(
+    //   `ws://localhost:5500/ws/room?code=${encodeURIComponent(roomCode)}`,
+    // );
     wsRef.current = ws;
 
     ws.onopen = () => {
